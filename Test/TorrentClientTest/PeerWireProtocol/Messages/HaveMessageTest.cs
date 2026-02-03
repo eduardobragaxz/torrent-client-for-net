@@ -2,41 +2,38 @@
 using TorrentClient.Extensions;
 using TorrentClient.PeerWireProtocol.Messages;
 
-namespace TorrentClient.Test.PeerWireProtocol.Messages
+namespace TorrentClientTest.PeerWireProtocol.Messages;
+
+/// <summary>
+/// The have message test.
+/// </summary>
+[TestClass]
+public class HaveMessageTest
 {
+    #region Public Methods
+
     /// <summary>
-    /// The have message test.
+    /// Tests the TryDecode() method.
     /// </summary>
-    [TestClass]
-    public class HaveMessageTest
+    [TestMethod]
+    public void HaveMessage_TryDecode()
     {
-        #region Public Methods
+        int offset = 0;
+        byte[] data = "0000000504000000AA".ToByteArray();
 
-        /// <summary>
-        /// Tests the TryDecode() method.
-        /// </summary>
-        [TestMethod]
-        public void HaveMessage_TryDecode()
+        if (HaveMessage.TryDecode(data, ref offset, data.Length, out HaveMessage message, out bool isIncomplete))
         {
-            HaveMessage message;
-            int offset = 0;
-            bool isIncomplete;
-            byte[] data = "0000000504000000AA".ToByteArray();
-
-            if (HaveMessage.TryDecode(data, ref offset, data.Length, out message, out isIncomplete))
-            {
-                Assert.AreEqual(9, message.Length);
-                Assert.AreEqual(170, message.PieceIndex);
-                Assert.AreEqual(false, isIncomplete);
-                Assert.AreEqual(data.Length, offset);
-                CollectionAssert.AreEqual(data, message.Encode());
-            }
-            else
-            {
-                Assert.Fail();
-            }
+            Assert.AreEqual(9, message.Length);
+            Assert.AreEqual(170, message.PieceIndex);
+            Assert.IsFalse(isIncomplete);
+            Assert.AreEqual(data.Length, offset);
+            CollectionAssert.AreEqual(data, message.Encode());
         }
-
-        #endregion Public Methods
+        else
+        {
+            Assert.Fail();
+        }
     }
+
+    #endregion Public Methods
 }

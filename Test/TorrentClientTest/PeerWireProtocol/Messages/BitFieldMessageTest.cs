@@ -2,57 +2,54 @@
 using TorrentClient.Extensions;
 using TorrentClient.PeerWireProtocol.Messages;
 
-namespace TorrentClient.Test.PeerWireProtocol.Messages
+namespace TorrentClientTest.PeerWireProtocol.Messages;
+
+/// <summary>
+/// The un-choke message test.
+/// </summary>
+[TestClass]
+public class BitFieldMessageTest
 {
+    #region Public Methods
+
     /// <summary>
-    /// The un-choke message test.
+    /// Tests the TryDecode() method.
     /// </summary>
-    [TestClass]
-    public class BitFieldMessageTest
+    [TestMethod]
+    public void TestTryDecodeBitfieldMessage()
     {
-        #region Public Methods
+        int offset = 0;
+        byte[] data = "0000000d05fffffffffffffffffffffff8".ToByteArray();
 
-        /// <summary>
-        /// Tests the TryDecode() method.
-        /// </summary>
-        [TestMethod]
-        public void TestTryDecodeBitfieldMessage()
+        if (BitFieldMessage.TryDecode(data, ref offset, data.Length, out BitFieldMessage message, out bool isIncomplete))
         {
-            BitFieldMessage message;
-            int offset = 0;
-            byte[] data = "0000000d05fffffffffffffffffffffff8".ToByteArray();
-            bool isIncomplete;
+            Assert.AreEqual(17, message.Length);
+            Assert.HasCount(96, message.BitField);
+            Assert.IsTrue(message.BitField[0]);
+            Assert.IsFalse(isIncomplete);
+            Assert.AreEqual(data.Length, offset);
 
-            if (BitFieldMessage.TryDecode(data, ref offset, data.Length, out message, out isIncomplete))
+            for (int i = 0; i < message.BitField.Length; i++)
             {
-                Assert.AreEqual(17, message.Length);
-                Assert.AreEqual(96, message.BitField.Length);
-                Assert.AreEqual(true, message.BitField[0]);
-                Assert.AreEqual(false, isIncomplete);
-                Assert.AreEqual(data.Length, offset);
-
-                for (int i = 0; i < message.BitField.Length; i++)
+                if (i == 88 ||
+                    i == 89 ||
+                    i == 90)
                 {
-                    if (i == 88 ||
-                        i == 89 ||
-                        i == 90)
-                    {
-                        Assert.IsFalse(message.BitField[i]);
-                    }
-                    else
-                    {
-                        Assert.IsTrue(message.BitField[i]);
-                    }
+                    Assert.IsFalse(message.BitField[i]);
                 }
+                else
+                {
+                    Assert.IsTrue(message.BitField[i]);
+                }
+            }
 
-                CollectionAssert.AreEqual(data, message.Encode());
-            }
-            else
-            {
-                Assert.Fail();
-            }
+            CollectionAssert.AreEqual(data, message.Encode());
         }
-
-        #endregion Public Methods
+        else
+        {
+            Assert.Fail();
+        }
     }
+
+    #endregion Public Methods
 }

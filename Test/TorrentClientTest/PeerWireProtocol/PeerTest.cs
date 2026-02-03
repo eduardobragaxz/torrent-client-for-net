@@ -1,60 +1,60 @@
-﻿using System.Linq;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
-using System.Threading;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using TorrentClient;
 using TorrentClient.Extensions;
 using TorrentClient.PeerWireProtocol;
 
-namespace TorrentClient.Test.PeerWireProtocol
+namespace TorrentClientTest.PeerWireProtocol;
+
+/// <summary>
+/// The peer test.
+/// </summary>
+[TestClass]
+public class PeerTest
 {
+    #region Public Methods
+
     /// <summary>
-    /// The peer test.
+    /// Tests the peer transfer.
     /// </summary>
-    [TestClass]
-    public class PeerTest
+    [TestMethod]
+    public void TestPeerTransfer()
     {
-        #region Public Methods
+        Peer peer;
+        IPEndPoint endpoint = new(IPAddress.Parse("192.168.0.10"), 4009);
+        TcpClient tcp;
+        byte[] data;
+        PieceManager pm;
+        ThrottlingManager tm;
+        PieceStatus[] bitField;
 
-        /// <summary>
-        /// Tests the peer transfer.
-        /// </summary>
-        [TestMethod]
-        public void TestPeerTransfer()
+        TorrentInfo.TryLoad(@"C:\Users\aljaz\Desktop\Torrent1\Torrent2.torrent", out TorrentInfo torrent);
+
+        tcp = new TcpClient
         {
-            TorrentInfo torrent;
-            Peer peer;
-            IPEndPoint endpoint = new IPEndPoint(IPAddress.Parse("192.168.0.10"), 4009);
-            TcpClient tcp;
-            byte[] data;
-            PieceManager pm;
-            ThrottlingManager tm;
-            PieceStatus[] bitField;
+            ReceiveBufferSize = 1024 * 1024,
+            SendBufferSize = 1024 * 1024
+        };
+        tcp.Connect(endpoint);
 
-            TorrentInfo.TryLoad(@"C:\Users\aljaz\Desktop\Torrent1\Torrent2.torrent", out torrent);
+        data = new byte[torrent.Length];
 
-            tcp = new TcpClient();
-            tcp.ReceiveBufferSize = 1024 * 1024;
-            tcp.SendBufferSize = 1024 * 1024;
-            tcp.Connect(endpoint);
+        tm = new ThrottlingManager
+        {
+            WriteSpeedLimit = 1024 * 1024,
+            ReadSpeedLimit = 1024 * 1024
+        };
 
-            data = new byte[torrent.Length];
+        bitField = new PieceStatus[torrent.PiecesCount];
 
-            tm = new ThrottlingManager();
-            tm.WriteSpeedLimit = 1024 * 1024;
-            tm.ReadSpeedLimit = 1024 * 1024;
+        pm = new PieceManager(torrent.InfoHash, torrent.Length, torrent.PieceHashes, torrent.PieceLength, torrent.BlockLength, bitField);
+        pm.PieceCompleted += (sender, e) => Assert.AreEqual(torrent.PieceHashes.ElementAt(e.PieceIndex), e.PieceData.CalculateSha1Hash().ToHexaDecimalString());
 
-            bitField = new PieceStatus[torrent.PiecesCount];
+        peer = new Peer(new PeerCommunicator(tm, tcp), pm, "-UT3530-B9731F4C29D30E7DEA1F9FA7");
+        peer.CommunicationErrorOccurred += (sender, e) => Assert.Fail();
 
-            pm = new PieceManager(torrent.InfoHash, torrent.Length, torrent.PieceHashes, torrent.PieceLength, torrent.BlockLength, bitField);
-            pm.PieceCompleted += (sender, e) => Assert.AreEqual(torrent.PieceHashes.ElementAt(e.PieceIndex), e.PieceData.CalculateSha1Hash().ToHexaDecimalString());
-
-            peer = new Peer(new PeerCommunicator(tm, tcp), pm, "-UT3530-B9731F4C29D30E7DEA1F9FA7");
-            peer.CommunicationErrorOccurred += (sender, e) => Assert.Fail();
-
-            Thread.Sleep(1000000);
-        }
-
-        #endregion Public Methods
+        Thread.Sleep(1000000);
     }
+
+    #endregion Public Methods
 }

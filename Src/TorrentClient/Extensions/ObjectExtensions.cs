@@ -1,33 +1,32 @@
 ﻿using System;
 
-namespace TorrentClient.Extensions
+namespace TorrentClient.Extensions;
+
+/// <summary>
+/// The object extenstions.
+/// </summary>
+public static class ObjectExtensions
 {
+    #region Public Methods
+
     /// <summary>
-    /// The object extenstions.
+    /// Asynchronouses the specified value.
     /// </summary>
-    public static class ObjectExtensions
+    /// <typeparam name="T">The value type.</typeparam>
+    /// <param name="value">The value.</param>
+    /// <returns>The casted value.</returns>
+    /// <exception cref="System.ArgumentException">Value is of incorrect type</exception>
+    public static T As<T>(this object value)
     {
-        #region Public Methods
-
-        /// <summary>
-        /// Asynchronouses the specified value.
-        /// </summary>
-        /// <typeparam name="T">The value type.</typeparam>
-        /// <param name="value">The value.</param>
-        /// <returns>The casted value.</returns>
-        /// <exception cref="System.ArgumentException">Value is of incorrect type</exception>
-        public static T As<T>(this object value)
+        if (value is T)
         {
-            if (value is T)
-            {
-                return (T)value;
-            }
-            else
-            {
-                throw new ArgumentException("Value is of incorrect type");
-            }
+            return (T)value;
         }
-
-        #endregion Public Methods
+        else
+        {
+            throw new ArgumentException("Value is of incorrect type");
+        }
     }
+
+    #endregion Public Methods
 }

@@ -1,9 +1,8 @@
-﻿namespace TorrentClient
+﻿namespace TorrentClient;
+
+/// <summary>
+/// The torrent tracker info.
+/// </summary>
+public class TorrentTrackerInfo
 {
-	/// <summary>
-	/// The torrent tracker info.
-	/// </summary>
-	public class TorrentTrackerInfo
-	{
-	}
 }

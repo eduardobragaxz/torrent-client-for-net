@@ -2,43 +2,40 @@
 using TorrentClient.Extensions;
 using TorrentClient.PeerWireProtocol.Messages;
 
-namespace TorrentClient.Test.PeerWireProtocol.Messages
+namespace TorrentClientTest.PeerWireProtocol.Messages;
+
+/// <summary>
+/// The cancel message test.
+/// </summary>
+[TestClass]
+public class CancelMessageTest
 {
+    #region Public Methods
+
     /// <summary>
-    /// The cancel message test.
+    /// Tests the TryDecode() method.
     /// </summary>
-    [TestClass]
-    public class CancelMessageTest
+    [TestMethod]
+    public void CancelMessage_TryDecode()
     {
-        #region Public Methods
+        int offset = 0;
+        byte[] data = "0000000D08000000050000000600000007".ToByteArray();
 
-        /// <summary>
-        /// Tests the TryDecode() method.
-        /// </summary>
-        [TestMethod]
-        public void CancelMessage_TryDecode()
+        if (CancelMessage.TryDecode(data, ref offset, data.Length, out CancelMessage message, out bool isIncomplete))
         {
-            CancelMessage message;
-            int offset = 0;
-            bool isIncomplete;
-            byte[] data = "0000000D08000000050000000600000007".ToByteArray();
-
-            if (CancelMessage.TryDecode(data, ref offset, data.Length, out message, out isIncomplete))
-            {
-                Assert.AreEqual(17, message.Length);
-                Assert.AreEqual(5, message.PieceIndex);
-                Assert.AreEqual(6, message.BlockOffset);
-                Assert.AreEqual(7, message.BlockLength);
-                Assert.AreEqual(false, isIncomplete);
-                Assert.AreEqual(data.Length, offset);
-                CollectionAssert.AreEqual(data, message.Encode());
-            }
-            else
-            {
-                Assert.Fail();
-            }
+            Assert.AreEqual(17, message.Length);
+            Assert.AreEqual(5, message.PieceIndex);
+            Assert.AreEqual(6, message.BlockOffset);
+            Assert.AreEqual(7, message.BlockLength);
+            Assert.IsFalse(isIncomplete);
+            Assert.AreEqual(data.Length, offset);
+            CollectionAssert.AreEqual(data, message.Encode());
         }
-
-        #endregion Public Methods
+        else
+        {
+            Assert.Fail();
+        }
     }
+
+    #endregion Public Methods
 }

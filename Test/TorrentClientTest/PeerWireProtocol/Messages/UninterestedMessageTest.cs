@@ -2,40 +2,37 @@
 using TorrentClient.Extensions;
 using TorrentClient.PeerWireProtocol.Messages;
 
-namespace TorrentClient.Test.PeerWireProtocol.Messages
+namespace TorrentClientTest.PeerWireProtocol.Messages;
+
+/// <summary>
+/// The interested message test.
+/// </summary>
+[TestClass]
+public class UninterestedMessageTest
 {
+    #region Public Methods
+
     /// <summary>
-    /// The interested message test.
+    /// Tests the TryDecode() method.
     /// </summary>
-    [TestClass]
-    public class UninterestedMessageTest
+    [TestMethod]
+    public void UninterestedMessage_TryDecode()
     {
-        #region Public Methods
+        int offset = 0;
+        byte[] data = "0000000103".ToByteArray();
 
-        /// <summary>
-        /// Tests the TryDecode() method.
-        /// </summary>
-        [TestMethod]
-        public void UninterestedMessage_TryDecode()
+        if (UninterestedMessage.TryDecode(data, ref offset, data.Length, out UninterestedMessage message, out bool isIncomplete))
         {
-            UninterestedMessage message;
-            int offset = 0;
-            bool isIncomplete;
-            byte[] data = "0000000103".ToByteArray();
-
-            if (UninterestedMessage.TryDecode(data, ref offset, data.Length, out message, out isIncomplete))
-            {
-                Assert.AreEqual(5, message.Length);
-                Assert.AreEqual(false, isIncomplete);
-                Assert.AreEqual(data.Length, offset);
-                CollectionAssert.AreEqual(data, message.Encode());
-            }
-            else
-            {
-                Assert.Fail();
-            }
+            Assert.AreEqual(5, message.Length);
+            Assert.IsFalse(isIncomplete);
+            Assert.AreEqual(data.Length, offset);
+            CollectionAssert.AreEqual(data, message.Encode());
         }
-
-        #endregion Public Methods
+        else
+        {
+            Assert.Fail();
+        }
     }
+
+    #endregion Public Methods
 }

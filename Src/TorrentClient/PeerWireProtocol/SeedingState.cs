@@ -1,18 +1,17 @@
-﻿namespace TorrentClient.PeerWireProtocol
+﻿namespace TorrentClient.PeerWireProtocol;
+
+/// <summary>
+/// The seeding state.
+/// </summary>
+public enum SeedingState
 {
     /// <summary>
-    /// The seeding state.
+    /// The choked seed state.
     /// </summary>
-    public enum SeedingState
-    {
-        /// <summary>
-        /// The choked seed state.
-        /// </summary>
-        Choked = 1,
+    Choked = 1,
 
-        /// <summary>
-        /// The un-choked seed state.
-        /// </summary>
-        Unchoked = 2,
-    }
+    /// <summary>
+    /// The un-choked seed state.
+    /// </summary>
+    Unchoked = 2,
 }

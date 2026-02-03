@@ -6,47 +6,46 @@ using System.Reflection;
 using System.Web;
 using DefensiveProgrammingFramework;
 
-namespace TorrentClient.Extensions
+namespace TorrentClient.Extensions;
+
+/// <summary>
+/// The input / output extensions.
+/// </summary>
+public static class IoExtensions
 {
+    #region Public Methods
+
     /// <summary>
-    /// The input / output extensions.
+    /// Deletes the directory recursively.
     /// </summary>
-    public static class IoExtensions
+    /// <param name="directoryPath">The directory path.</param>
+    /// <param name="deleteOnlyDirectoryContents">if set to <c>true</c> delete only directory contents.</param>
+    public static void DeleteDirectoryRecursively(this string directoryPath, bool deleteOnlyDirectoryContents = false)
     {
-        #region Public Methods
+        directoryPath.MustBeValidDirectoryPath();
 
-        /// <summary>
-        /// Deletes the directory recursively.
-        /// </summary>
-        /// <param name="directoryPath">The directory path.</param>
-        /// <param name="deleteOnlyDirectoryContents">if set to <c>true</c> delete only directory contents.</param>
-        public static void DeleteDirectoryRecursively(this string directoryPath, bool deleteOnlyDirectoryContents = false)
+        if (Directory.Exists(directoryPath))
         {
-            directoryPath.MustBeValidDirectoryPath();
-
-            if (Directory.Exists(directoryPath))
+            // delete files
+            foreach (string file in Directory.GetFiles(directoryPath, "*", SearchOption.AllDirectories))
             {
-                // delete files
-                foreach (string file in Directory.GetFiles(directoryPath, "*", SearchOption.AllDirectories))
-                {
-                    File.SetAttributes(file, FileAttributes.Normal);
-                    File.Delete(file);
-                }
+                File.SetAttributes(file, FileAttributes.Normal);
+                File.Delete(file);
+            }
 
-                // delete subdirectories
-                foreach (string subDirectory in Directory.GetDirectories(directoryPath))
-                {
-                    DeleteDirectoryRecursively(subDirectory);
-                }
+            // delete subdirectories
+            foreach (string subDirectory in Directory.GetDirectories(directoryPath))
+            {
+                DeleteDirectoryRecursively(subDirectory);
+            }
 
-                if (!deleteOnlyDirectoryContents)
-                {
-                    // delete root directory
-                    Directory.Delete(directoryPath, true);
-                }
+            if (!deleteOnlyDirectoryContents)
+            {
+                // delete root directory
+                Directory.Delete(directoryPath, true);
             }
         }
-
-        #endregion Public Methods
     }
+
+    #endregion Public Methods
 }

@@ -1,36 +1,35 @@
 ﻿using System;
 
-namespace TorrentClient.Extensions
+namespace TorrentClient.Extensions;
+
+/// <summary>
+/// The exception extensions.
+/// </summary>
+public static class ExceptionExtensions
 {
+    #region Public Methods
+
     /// <summary>
-    /// The exception extensions.
+    /// Formats the specified exception.
     /// </summary>
-    public static class ExceptionExtensions
+    /// <param name="exception">The exception.</param>
+    /// <returns>Fhe formatted exception.</returns>
+    public static string Format(this Exception exception)
     {
-        #region Public Methods
+        string message = string.Empty;
 
-        /// <summary>
-        /// Formats the specified exception.
-        /// </summary>
-        /// <param name="exception">The exception.</param>
-        /// <returns>Fhe formatted exception.</returns>
-        public static string Format(this Exception exception)
+        while (exception != null)
         {
-            string message = string.Empty;
+            message += exception.GetType().ToString() + ": " + exception.Message.Trim();
+            message += Environment.NewLine;
+            message += exception.StackTrace;
+            message += Environment.NewLine;
 
-            while (exception != null)
-            {
-                message += exception.GetType().ToString() + ": " + exception.Message.Trim();
-                message += Environment.NewLine;
-                message += exception.StackTrace;
-                message += Environment.NewLine;
-
-                exception = exception.InnerException;
-            }
-
-            return message;
+            exception = exception.InnerException;
         }
 
-        #endregion Public Methods
+        return message;
     }
+
+    #endregion Public Methods
 }
